@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Voice Translator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f1f3f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 700px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #4A90E2;
+      color: white;
+      text-align: center;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .user-msg {
+      align-self: flex-end;
+      background: #d4edff;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot-msg {
+      align-self: flex-start;
+      background: #f0f0f0;
+      border-bottom-left-radius: 0;
+    }
+
+    .chat-footer {
+      padding: 12px 16px;
+      background: #f8f9fb;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-select {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .input-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 14px;
+      padding: 6px 12px;
+    }
+
+    .input-box textarea {
+      width: 100%;
+      border: none;
+      resize: none;
+      font-size: 14px;
+      outline: none;
+      height: 32px;
+      background: transparent;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #4A90E2;
+      transition: color 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: #2c6ed5;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    #loading {
+      font-size: 12px;
+      color: #888;
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">AI Voice Translator</div>
+
+    <div class="chat-body" id="chat-body">
+      <!-- Chat bubbles will be dynamically added here -->
+    </div>
+
+    <div class="chat-footer">
+      <div class="lang-select">
+        <select id="input-language"></select>
+        <select id="output-language"></select>
+      </div>
+
+      <div class="input-box">
+        <textarea id="input-text" placeholder="Type or speak..."></textarea>
+        <button class="icon-btn" onclick="recognition.start()" title="Voice Input">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <button class="icon-btn" onclick="translateText()" title="Translate">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <div id="loading"></div>
+    </div>
+  </div>
+
+  <script>
+    let recognition;
+
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      // Override the start method to inject reset behavior
+      const originalStart = recognition.start;
+      recognition.start = function () {
+        // Clear input field
+        document.getElementById('input-text').value = '';
+
+        // Reset language dropdown to Auto Detect
+        document.getElementById('input-language').value = '';
+
+        // Set fallback language for recognition (since Web Speech API doesn't support auto detect)
+        recognition.lang = 'en-US';
+
+        // Start original recognition
+        originalStart.call(this);
+      };
+
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('input-text').value = transcript;
+        detectLanguage(transcript); // Detect language after speech
+      };
+
+      recognition.onerror = function(event) {
+        alert('Voice recognition error: ' + event.error);
+      };
+    } else {
+      alert('Your browser does not support voice recognition.');
+    }
+
+
+    async function loadLanguages() {
+      const response = await fetch('/languages');
+      const languages = await response.json();
+
+      const inputLangSelect = document.getElementById('input-language');
+      const outputLangSelect = document.getElementById('output-language');
+
+      for (const [code, name] of Object.entries(languages)) {
+        const optionInput = document.createElement('option');
+        optionInput.value = code;
+        optionInput.textContent = name;
+        inputLangSelect.appendChild(optionInput);
+
+        const optionOutput = document.createElement('option');
+        optionOutput.value = code;
+        optionOutput.textContent = name;
+        outputLangSelect.appendChild(optionOutput);
+      }
+
+      // ✅ Set default output language to English
+      outputLangSelect.value = 'en';
+    }
+
+    function addChatBubble(text, type) {
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${type}`;
+      bubble.textContent = text;
+      document.getElementById('chat-body').appendChild(bubble);
+      document.getElementById('chat-body').scrollTop = document.getElementById('chat-body').scrollHeight;
+    }
+
+    async function translateText() {
+      const inputText = document.getElementById('input-text').value;
+      const inputLang = document.getElementById('input-language').value;
+      const outputLang = document.getElementById('output-language').value;
+
+      if (!inputText || !inputLang || !outputLang) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      addChatBubble(inputText, 'user-msg');
+      document.getElementById('loading').textContent = 'Translating...';
+      document.getElementById('input-text').value = '';
+
+      const response = await fetch('/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputText, input_lang: inputLang, output_lang: outputLang })
+      });
+
+      const result = await response.json();
+      document.getElementById('loading').textContent = '';
+
+      if (result.error) {
+        alert(result.error);
+      } else {
+        addChatBubble(result.translated_text, 'bot-msg');
+
+        if (result.audio_url) {
+          const audio = document.createElement('audio');
+          audio.controls = true;
+          audio.src = result.audio_url;
+          document.getElementById('chat-body').appendChild(audio);
+          document.getElementById('chat-body').scrollTop = document.getElementById('chat-body').scrollHeight;
+        }
+      }
+    }
+
+    async function detectLanguage(text) {
+      const response = await fetch('/detect_language', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      });
+
+      const data = await response.json();
+      const inputLangSelect = document.getElementById('input-language');
+
+      if (data.detected_language) {
+        const langCode = data.detected_language;
+
+        // Set dropdown if detected lang is available
+        if ([...inputLangSelect.options].some(opt => opt.value === langCode)) {
+          inputLangSelect.value = langCode;
+        }
+
+        console.log('Detected language:', langCode, 'Confidence:', data.confidence);
+      } else {
+        console.error('Language detection failed:', data.error);
+      }
+    }
+
+    window.onload = loadLanguages;
+  </script>
+</body>
+</html>

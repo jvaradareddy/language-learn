@@ -1,0 +1,97 @@
+/* General Reset and Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 2.5em;
+    color: #4A90E2;
+    font-weight: bold;
+}
+
+/* Container for the whole page */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Styling */
+.section {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #555;
+}
+
+textarea, select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 12px 20px;
+    background-color: #4A90E2;
+    color: white;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #357ABD;
+}
+
+#voice-button {
+    background-color: #8B7AF4;
+    margin-top: 10px;
+    width: auto;
+    padding: 10px 20px;
+}
+
+#voice-button:hover {
+    background-color: #6a66b3;
+}
+
+/* Styling for the results */
+#translated-text, #subtitles {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 1.1em;
+    word-wrap: break-word;
+}
+
+#audio-player {
+    display: block;
+    margin-top: 20px;
+    width: 100%;
+}
+
+#loading {
+    text-align: center;
+    font-size: 1.2em;
+    color: #4A90E2;
+    display: none;
+}
