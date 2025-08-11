@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Voice Translator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f1f3f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 700px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #4A90E2;
+      color: white;
+      text-align: center;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .user-msg {
+      align-self: flex-end;
+      background: #d4edff;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot-msg {
+      align-self: flex-start;
+      background: #f0f0f0;
+      border-bottom-left-radius: 0;
+    }
+
+    .chat-footer {
+      padding: 12px 16px;
+      background: #f8f9fb;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-select {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .input-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 14px;
+      padding: 6px 12px;
+    }
+
+    .input-box textarea {
+      width: 100%;
+      border: none;
+      resize: none;
+      font-size: 14px;
+      outline: none;
+      height: 32px;
+      background: transparent;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #4A90E2;
+      transition: color 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: #2c6ed5;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    #loading {
+      font-size: 12px;
+      color: #888;
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">AI Voice Translator</div>
+
+    <div class="chat-body" id="chat-body">
+      <!-- Chat bubbles will be dynamically added here -->
+    </div>
+
+    <div class="chat-footer">
+      <div class="lang-select">
+        <select id="input-language"></select>
+        <select id="output-language"></select>
+      </div>
+
+      <div class="input-box">
+        <textarea id="input-text" placeholder="Type or speak..."></textarea>
+        <button class="icon-btn" onclick="recognition.start()" title="Voice Input">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <button class="icon-btn" onclick="translateText()" title="Translate">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <div id="loading"></div>
+    </div>
+  </div>
+
+  <script src="/static/scripts.js"></script>
+
+</body>
+</html>
