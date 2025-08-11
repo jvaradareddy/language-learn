@@ -8,19 +8,20 @@ import glob
 from flask import Flask
 from flask_cors import CORS
 
-# ✅ Base project directory
+# ✅ Base project directory (backend folder)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ✅ Static directory (inside current project)
-STATIC_DIR = os.path.join(BASE_DIR, "static")
+# ✅ Path to frontend folder
+FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend"))
+STATIC_DIR = os.path.join(FRONTEND_DIR, "static")
 
 # ✅ Ensure static folder exists
 os.makedirs(STATIC_DIR, exist_ok=True)
 
-print("Static dir:", STATIC_DIR)
-print("Static exists:", os.path.exists(STATIC_DIR))
+print("Frontend dir:", FRONTEND_DIR)
+print("Index exists:", os.path.exists(os.path.join(FRONTEND_DIR, "index.html")))
 
-# ✅ Create Flask app
+# ✅ Create Flask app (serving from static dir)
 app = Flask(__name__, static_folder=STATIC_DIR)
 CORS(app)
 
