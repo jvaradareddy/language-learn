@@ -11,19 +11,20 @@ from flask_cors import CORS
 # ✅ Base project directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ✅ Paths for frontend and static
-FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend"))
-STATIC_DIR = os.path.join(FRONTEND_DIR, "static")
+# ✅ Static directory (inside current project)
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-print("Frontend dir:", FRONTEND_DIR)
-print("Index exists:", os.path.exists(os.path.join(FRONTEND_DIR, "index.html")))
+# ✅ Ensure static folder exists
+os.makedirs(STATIC_DIR, exist_ok=True)
+
+print("Static dir:", STATIC_DIR)
+print("Static exists:", os.path.exists(STATIC_DIR))
 
 # ✅ Create Flask app
 app = Flask(__name__, static_folder=STATIC_DIR)
 CORS(app)
-# CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Translator
+# ✅ Translator instance
 translator = Translator()
 
 def clean_old_audio_files():
